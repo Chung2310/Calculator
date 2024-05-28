@@ -6,11 +6,15 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 
 public class MainActivity extends Activity {
     Button b1,b2,b3,b4,b5,b6,b7,b8,b9,b0,bdot,bpi,bequal,bplus,bmin,bmul,bdiv,binv,bsqrt,bsquare,bfact,bln,blog,btan,bcos,bsin,bb1,bb2,bc,bac;
     TextView tvmain,tvsec;
-    String pi = "3.14159265";
+    String pi = "3.14";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -155,14 +159,6 @@ public class MainActivity extends Activity {
                 tvmain.setText(tvmain.getText()+"÷");
             }
         });
-        bsqrt.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String val = tvmain.getText().toString();
-                double r = Math.sqrt(Double.parseDouble(val));
-                tvmain.setText(String.valueOf(r));
-            }
-        });
         bb1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -215,6 +211,14 @@ public class MainActivity extends Activity {
                 tvsec.setText(val+"!");
             }
         });
+        bsqrt.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String val = tvmain.getText().toString();
+                double r = Math.sqrt(Double.parseDouble(val));
+                tvmain.setText(String.valueOf(r));
+            }
+        });
         bsquare.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -239,11 +243,17 @@ public class MainActivity extends Activity {
         bequal.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String val = tvmain.getText().toString();
-                String replacedstr = val.replace('÷','/').replace('×','*');
-                double result = eval(replacedstr);
-                tvmain.setText(String.valueOf(result));
-                tvsec.setText(val);
+                try {
+                    String val = tvmain.getText().toString();
+                    String replacedstr = val.replace('÷', '/').replace('×', '*');
+                    double result = eval(replacedstr);
+                    result = round(result,3);
+                    tvmain.setText(String.valueOf(result));
+                    tvsec.setText(val);
+                }
+                catch (Exception e){
+                    Toast.makeText(MainActivity.this,"Biểu thức lỗi!", Toast.LENGTH_LONG).show();
+                }
             }
         });
     }
@@ -273,7 +283,6 @@ public class MainActivity extends Activity {
             double parse() {
                 nextChar();
                 double x = parseExpression();
-                if (pos < str.length()) throw new RuntimeException("Unexpected: " + (char)ch);
                 return x;
             }
 
@@ -317,9 +326,9 @@ public class MainActivity extends Activity {
                     else if (func.equals("tan")) x = Math.tan(Math.toRadians(x));
                     else if (func.equals("log")) x = Math.log10(x);
                     else if (func.equals("ln")) x = Math.log(x);
-                    else throw new RuntimeException("Unknown function: " + func);
+                    else throw new RuntimeException("Hàm không xác định: " + func);
                 } else {
-                    throw new RuntimeException("Unexpected: " + (char)ch);
+                    throw new RuntimeException("Lỗi: " + (char)ch);
                 }
 
                 if (eat('^')) x = Math.pow(x, parseFactor());
@@ -327,5 +336,11 @@ public class MainActivity extends Activity {
                 return x;
             }
         }.parse();
+    }
+    private double round(double value, int places) {
+        if (places < 0) throw new IllegalArgumentException();
+        BigDecimal bd = new BigDecimal(Double.toString(value));
+        bd = bd.setScale(places, RoundingMode.HALF_UP);
+        return bd.doubleValue();
     }
 }

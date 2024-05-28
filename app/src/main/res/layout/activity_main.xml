@@ -30,11 +30,10 @@
         android:layout_height="0dp"
         android:background="@drawable/vienview"
         android:text=""
+        android:textAlignment="viewEnd"
         android:textColor="#fff"
         android:textSize="50sp"
-        android:textAlignment="viewEnd"
         android:padding="10dp"
-        android:gravity="bottom"
         android:maxLines="1"
         android:layout_weight="2">
 
